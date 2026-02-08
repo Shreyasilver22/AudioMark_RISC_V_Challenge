@@ -48,7 +48,7 @@ Comparing the throughput of both implementations:
 * **Scalar Throughput:** $\approx \frac{1 \text{ element}}{12 \text{ cycles}}$
 * **Vector Throughput:** $\approx \frac{8 \text{ elements}}{10 \text{ cycles}}$
 
-$$\text{Speedup} \approx \frac{\text{Vector Throughput}}{\text{Scalar Throughput}} \approx \frac{0.8}{0.083} \approx 9.6\times$$
+$$\text{Speedup} \approx \frac{\text{Vector Throughput}}{\text{Scalar Throughput}} \approx \frac{0.8}{0.083} \approx 9.6\$$
 
 **Conclusion:**
 The vectorized implementation is expected to achieve a **9x to 12x speedup** over the scalar baseline. This gain is derived from:
