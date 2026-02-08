@@ -26,13 +26,13 @@ The vector configuration is set to `m8` (LMUL=8), grouping 8 vector registers fo
 
 ## Performance Analysis (Theoretical) as of 8 February,2026
 
-Due to the unavailability of a cycle-accurate RVV 1.0 simulator in the local environment, I performed a theoretical "back-of-the-envelope" analysis to estimate the speedup of the vectorized solution compared to a scalar baseline.
+Due to the unavailability of a cycle-accurate RVV 1.0 simulator in the local environment, I performed a theoretical analysis to estimate the speedup of the vectorized solution compared to a scalar baseline.
 
 ### 1. Scalar Baseline (Standard C)
-A standard scalar implementation of `q15_axpy` processes one element at a time. The critical path per iteration includes:
-* **Memory Access:** 2 Loads, 1 Store.
-* **Arithmetic:** 1 Multiply, 1 Add.
-* **Saturation Logic:** This is the primary bottleneck. Standard C requires conditional branching (`if/else`) to check for overflows/underflows. Branch mispredictions can cost 3-5 cycles each, significantly reducing pipeline efficiency.
+A standard scalar implementation of `q15_axpy` processes one element at a time. The critical path per cycle includes:
+* **Memory Access:** 2 Loads, 1 Store
+* **Arithmetic:** 1 Multiply, 1 Add
+* **Saturation Logic:** The primary bottleneck. Standard C requires (if/else statements) to check for overflows/underflows. Branch mispredictions can cost 3-5 cycles each,  reducing pipeline efficiency
 * **Loop Overhead:** Pointer increments and loop counter checks per element.
 * **Estimated Cost:** ~10-15 cycles per element.
 
@@ -72,8 +72,28 @@ This code was verified using the **Godbolt Compiler Explorer** environment with 
 * **Compiler:** RISC-V GCC (rv32gcv / rv64gcv)
 * **Simulator:** Spike (ISA Simulator)
 * **Verification:** Verified via assembly inspection for correct instruction generation (`vsetvl`, `vsmul`, `vsadd`).
+## Compilation Result in GodBolt.org
+![Test Output Verification](assets/screenshot.png)
 
 ### Building (Requires RISC-V Toolchain)
+
 To compile the solution locally:
 ```bash
 riscv64-unknown-elf-gcc -march=rv64gcv -O3 -c src/q15_axpy_rvv.c -o q15_axpy.o
+```
+```bash
+riscv64-unknown-elf-gcc \
+-O2 \
+-march=rv64gcv \
+-mabi=lp64 \
+src/q15_axpy_challenge.c \
+-o q15.elf
+```
+```bash
+sudo apt update
+sudo apt install qemu-user qemu-system-misc
+```
+I tried to simulate the results using Spike and GCC compiler, but would get stuck in this error cycle constantly, would try to fix it in future trials.Currently due to less time , I am not completing the simulation for now.
+
+![Test Output Verification](assets/screenshotqemu.png)
+
