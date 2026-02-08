@@ -95,5 +95,5 @@ sudo apt install qemu-user qemu-system-misc
 ```
 I tried to simulate the results using Spike and GCC compiler, but would get stuck in this error cycle constantly, would try to fix it in future trials.Currently due to less time , I am not completing the simulation for now.
 
-![Test Output Verification](assets/screenshotqemu.png)
+![Test Output Verification](assets/screenshotqemu.jpg)
 
