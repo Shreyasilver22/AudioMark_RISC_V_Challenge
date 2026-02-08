@@ -93,7 +93,6 @@ src/q15_axpy_challenge.c \
 sudo apt update
 sudo apt install qemu-user qemu-system-misc
 ```
-I tried to simulate the results using Spike and GCC compiler, but would get stuck in this error cycle constantly, would try to fix it in future trials.Currently due to less time , I am not completing the simulation for now.
-
+I tried to simulate the results using Qemu and GCC compiler, but would get stuck in this error cycle constantly, would try to fix it in future trials.This whole process was a very informative learning process for me in understanding how low level coding works and how important and difficult it can be to solve debugging errors,where the errors could be as minor as an underscore.Currently due to less time , I am not completing the simulation for now.
 ![Test Output Verification](assets/screenshotqemu.jpg)
 
