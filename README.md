@@ -73,7 +73,7 @@ This code was verified using the **Godbolt Compiler Explorer** environment with 
 * **Simulator:** Spike (ISA Simulator)
 * **Verification:** Verified via assembly inspection for correct instruction generation (`vsetvl`, `vsmul`, `vsadd`).
 ## Compilation Result in GodBolt.org
-![Test Output Verification](assets/screenshot.png)
+![Test Output Verification](assets/screenshot.jpg)
 
 ### Building (Requires RISC-V Toolchain)
 
