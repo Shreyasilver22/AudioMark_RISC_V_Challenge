@@ -23,6 +23,39 @@ Audio processing requires Q15 fixed-point arithmetic with saturation. Instead of
 The vector configuration is set to `m8` (LMUL=8), grouping 8 vector registers for each operation.
 * **Benefit:** Maximizes the number of elements processed per instruction, amortizing the loop overhead (pointer updates, counters) over a larger batch of data.
 
+
+## Performance Analysis (Theoretical) as of 8 February,2026
+
+Due to the unavailability of a cycle-accurate RVV 1.0 simulator in the local environment, I performed a theoretical "back-of-the-envelope" analysis to estimate the speedup of the vectorized solution compared to a scalar baseline.
+
+### 1. Scalar Baseline (Standard C)
+A standard scalar implementation of `q15_axpy` processes one element at a time. The critical path per iteration includes:
+* **Memory Access:** 2 Loads, 1 Store.
+* **Arithmetic:** 1 Multiply, 1 Add.
+* **Saturation Logic:** This is the primary bottleneck. Standard C requires conditional branching (`if/else`) to check for overflows/underflows. Branch mispredictions can cost 3-5 cycles each, significantly reducing pipeline efficiency.
+* **Loop Overhead:** Pointer increments and loop counter checks per element.
+* **Estimated Cost:** ~10-15 cycles per element.
+
+### 2. Vectorized Implementation (RVV 1.0)
+The vectorized solution uses the `vsetvl` instruction to process batches of data. Assuming a standard hardware configuration of `VLEN = 128 bits`:
+* **Parallelism:** The vector register holds **eight** 16-bit elements ($128 / 16 = 8$).
+* **Hardware Saturation:** I utilized `vsmul.vx` and `vsadd.vv`. These instructions handle the Q15 fixed-point math and saturation in hardware, eliminating the need for software branching entirely.
+* **Amortized Overhead:** The loop overhead (checking `n > 0`, updating pointers) occurs only once for every 8 elements.
+* **Estimated Cost:** ~8-10 cycles per **8 elements** (effectively ~1-1.2 cycles per element).
+
+### 3. Speedup Calculation
+Comparing the throughput of both implementations:
+* **Scalar Throughput:** $\approx \frac{1 \text{ element}}{12 \text{ cycles}}$
+* **Vector Throughput:** $\approx \frac{8 \text{ elements}}{10 \text{ cycles}}$
+
+$$\text{Speedup} \approx \frac{\text{Vector Throughput}}{\text{Scalar Throughput}} \approx \frac{0.8}{0.083} \approx 9.6\times$$
+
+**Conclusion:**
+The vectorized implementation is expected to achieve a **9x to 12x speedup** over the scalar baseline. This gain is derived from:
+1.  **SIMD Parallelism:** Processing 8 elements per instruction.
+2.  **Branch Elimination:** Removing costly conditional branches for saturation logic.
+## Build & Verification
+
 ## Performance Analysis (Theoretical)
 
 Compared to a standard scalar C implementation, the vectorized approach offers significant speedup:
@@ -34,7 +67,6 @@ Compared to a standard scalar C implementation, the vectorized approach offers s
 | **Throughput** | ~1 element / 10-15 cycles | ~1 element / 1 cycle |
 | **Est. Speedup** | 1x | **8x - 12x** |
 
-## Build & Verification
 
 This code was verified using the **Godbolt Compiler Explorer** environment with the following configuration:
 * **Compiler:** RISC-V GCC (rv32gcv / rv64gcv)
